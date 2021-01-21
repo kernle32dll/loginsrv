@@ -1,6 +1,7 @@
 package oauth2
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -28,11 +29,11 @@ var providerGithub = Provider{
 	Name:     "github",
 	AuthURL:  "https://github.com/login/oauth/authorize",
 	TokenURL: "https://github.com/login/oauth/access_token",
-	GetUserInfo: func(token TokenInfo) (model.UserInfo, string, error) {
+	GetUserInfo: func(ctx context.Context, token TokenInfo) (model.UserInfo, string, error) {
 		gu := GithubUser{}
 		url := githubAPI + "/user"
-		req, _ := http.NewRequest("GET", url, nil)
-		req.Header.Set("Authorization", "token " + token.AccessToken)
+		req, _ := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+		req.Header.Set("Authorization", "token "+token.AccessToken)
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
 			return model.UserInfo{}, "", err

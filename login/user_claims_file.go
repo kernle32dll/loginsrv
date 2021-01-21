@@ -1,6 +1,7 @@
 package login
 
 import (
+	"context"
 	"io/ioutil"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -49,7 +50,7 @@ func (c *userClaimsFile) parseUserFile() error {
 }
 
 // Claims returns a map of the token claims for a user.
-func (c *userClaimsFile) Claims(userInfo model.UserInfo) (jwt.Claims, error) {
+func (c *userClaimsFile) Claims(_ context.Context, userInfo model.UserInfo) (jwt.Claims, error) {
 	for _, entry := range c.userFileEntries {
 		if match(userInfo, entry) {
 			claims := customClaims(userInfo.AsMap())

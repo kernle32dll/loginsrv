@@ -1,10 +1,12 @@
 package oauth2
 
 import (
-	. "github.com/stretchr/testify/assert"
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	. "github.com/stretchr/testify/assert"
 )
 
 var githubTestUserResponse = `{
@@ -50,7 +52,7 @@ func Test_Github_getUserInfo(t *testing.T) {
 
 	githubAPI = server.URL
 
-	u, rawJSON, err := providerGithub.GetUserInfo(TokenInfo{AccessToken: "secret"})
+	u, rawJSON, err := providerGithub.GetUserInfo(context.Background(), TokenInfo{AccessToken: "secret"})
 	NoError(t, err)
 	Equal(t, "octocat", u.Sub)
 	Equal(t, "octocat@github.com", u.Email)

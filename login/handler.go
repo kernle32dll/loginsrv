@@ -1,6 +1,7 @@
 package login
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -20,7 +21,7 @@ const contentTypeJWT = "application/jwt"
 const contentTypeJSON = "application/json"
 const contentTypePlain = "text/plain"
 
-type userClaimsFunc func(userInfo model.UserInfo) (jwt.Claims, error)
+type userClaimsFunc func(ctx context.Context, userInfo model.UserInfo) (jwt.Claims, error)
 
 // Handler is the mail login handler.
 // It serves the login ressource and does the authentication against the backends or oauth provider.
@@ -237,7 +238,7 @@ func (h *Handler) deleteToken(w http.ResponseWriter) {
 
 func (h *Handler) respondAuthenticated(w http.ResponseWriter, r *http.Request, userInfo model.UserInfo) {
 	userInfo.Expiry = time.Now().Add(h.config.JwtExpiry).Unix()
-	token, err := h.createToken(userInfo)
+	token, err := h.createToken(r.Context(), userInfo)
 	if err != nil {
 		logging.Application(r.Header).WithError(err).Error()
 		h.respondError(w, r)
@@ -274,11 +275,11 @@ func (h *Handler) respondAuthenticatedHTML(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(303)
 }
 
-func (h *Handler) createToken(userInfo model.UserInfo) (string, error) {
+func (h *Handler) createToken(ctx context.Context, userInfo model.UserInfo) (string, error) {
 	var claims jwt.Claims = userInfo
 	if h.userClaims != nil {
 		var err error
-		claims, err = h.userClaims(userInfo)
+		claims, err = h.userClaims(ctx, userInfo)
 		if err != nil {
 			return "", err
 		}

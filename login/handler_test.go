@@ -1,6 +1,7 @@
 package login
 
 import (
+	"context"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
@@ -290,7 +291,7 @@ func TestHandler_SetSecureCookie(t *testing.T) {
 func TestHandler_Refresh(t *testing.T) {
 	h := testHandler()
 	input := model.UserInfo{Sub: "bob", Expiry: time.Now().Add(time.Second).Unix()}
-	token, err := h.createToken(input)
+	token, err := h.createToken(context.Background(), input)
 	NoError(t, err)
 
 	cookieStr := "Cookie: " + h.config.CookieName + "=" + token + ";"
@@ -320,7 +321,7 @@ func TestHandler_Refresh(t *testing.T) {
 func TestHandler_Refresh_Expired(t *testing.T) {
 	h := testHandler()
 	input := model.UserInfo{Sub: "bob", Expiry: time.Now().Unix() - 1}
-	token, err := h.createToken(input)
+	token, err := h.createToken(context.Background(), input)
 	NoError(t, err)
 
 	cookieStr := "Cookie: " + h.config.CookieName + "=" + token + ";"
@@ -351,7 +352,7 @@ func TestHandler_Refresh_Invalid_Token(t *testing.T) {
 func TestHandler_Refresh_Max_Refreshes_Reached(t *testing.T) {
 	h := testHandler()
 	input := model.UserInfo{Sub: "bob", Expiry: time.Now().Add(time.Second).Unix(), Refreshes: 1}
-	token, err := h.createToken(input)
+	token, err := h.createToken(context.Background(), input)
 	NoError(t, err)
 
 	cookieStr := "Cookie: " + h.config.CookieName + "=" + token + ";"
@@ -450,7 +451,7 @@ func TestHandler_LoginWithEmptyUsername(t *testing.T) {
 func TestHandler_getToken_Valid(t *testing.T) {
 	h := testHandler()
 	input := model.UserInfo{Sub: "marvin", Expiry: time.Now().Add(time.Second).Unix()}
-	token, err := h.createToken(input)
+	token, err := h.createToken(context.Background(), input)
 	NoError(t, err)
 	r := &http.Request{
 		Header: http.Header{"Cookie": {h.config.CookieName + "=" + token + ";"}},
@@ -464,7 +465,7 @@ func TestHandler_getToken_Key_ID(t *testing.T) {
 	h := testHandler()
 	h.config.JwtKeyID = "some-id"
 	input := model.UserInfo{Sub: "marvin", Expiry: time.Now().Add(time.Second).Unix()}
-	token, err := h.createToken(input)
+	token, err := h.createToken(context.Background(), input)
 	NoError(t, err)
 	r := &http.Request{
 		Header: http.Header{"Cookie": {h.config.CookieName + "=" + token + ";"}},
@@ -482,7 +483,7 @@ func TestHandler_getToken_Key_ID(t *testing.T) {
 func TestHandler_ReturnUserInfoJSON(t *testing.T) {
 	h := testHandler()
 	input := model.UserInfo{Sub: "marvin", Expiry: time.Now().Add(time.Second).Unix()}
-	token, err := h.createToken(input)
+	token, err := h.createToken(context.Background(), input)
 	NoError(t, err)
 	url, _ := url.Parse("/context/login")
 	r := &http.Request{
@@ -529,7 +530,7 @@ func TestHandler_signAndVerify_ES256(t *testing.T) {
 	h.config.JwtAlgo = "ES256"
 	h.config.JwtSecret = "MHcCAQEEIJKMecdA9ASkZArOu9b+cPmSiVfQaaeErHcvkqG2gVIOoAoGCCqGSM49AwEHoUQDQgAE1gae9/zJDLHeuFteUkKgVhLrwJPoA43goNacgwldOucBvVUzD0EFAcpCR+0UcOfQ99CxUyKxWtnvr9xpDIXU0w=="
 	input := model.UserInfo{Sub: "marvin", Expiry: time.Now().Add(time.Second).Unix()}
-	token, err := h.createToken(input)
+	token, err := h.createToken(context.Background(), input)
 	NoError(t, err)
 	r := &http.Request{
 		Header: http.Header{"Cookie": {h.config.CookieName + "=" + token + ";"}},
@@ -563,7 +564,7 @@ func TestHandler_signAndVerify_RSA(t *testing.T) {
 			h.config.JwtSecret = string(pem.EncodeToMemory(privateKey))
 
 			input := model.UserInfo{Sub: "marvin", Expiry: time.Now().Add(time.Second).Unix()}
-			token, err := h.createToken(input)
+			token, err := h.createToken(context.Background(), input)
 			NoError(t, err)
 			r := &http.Request{
 				Header: http.Header{"Cookie": {h.config.CookieName + "=" + token + ";"}},
@@ -593,7 +594,7 @@ func TestHandler_signAndVerify_RSA(t *testing.T) {
 			"UVncBYg6g4CIrczoqYpJ3aBF5MVJ0FEU9XCDO/iDvCU="
 
 		input := model.UserInfo{Sub: "marvin", Expiry: time.Now().Add(time.Second).Unix()}
-		token, err := h.createToken(input)
+		token, err := h.createToken(context.Background(), input)
 		NoError(t, err)
 		r := &http.Request{
 			Header: http.Header{"Cookie": {h.config.CookieName + "=" + token + ";"}},
@@ -609,7 +610,7 @@ func TestHandler_signAndVerify_RSA(t *testing.T) {
 		h.config.JwtSecret = "-garbage-"
 
 		input := model.UserInfo{Sub: "marvin", Expiry: time.Now().Add(time.Second).Unix()}
-		_, err := h.createToken(input)
+		_, err := h.createToken(context.Background(), input)
 		Error(t, err)
 	})
 }
@@ -617,7 +618,7 @@ func TestHandler_signAndVerify_RSA(t *testing.T) {
 func TestHandler_getToken_InvalidSecret(t *testing.T) {
 	h := testHandler()
 	input := model.UserInfo{Sub: "marvin"}
-	token, err := h.createToken(input)
+	token, err := h.createToken(context.Background(), input)
 	NoError(t, err)
 	r := &http.Request{
 		Header: http.Header{"Cookie": {h.config.CookieName + "=" + token + ";"}},
@@ -647,10 +648,10 @@ func TestHandler_getToken_InvalidNoToken(t *testing.T) {
 func TestHandler_getToken_WithUserClaims(t *testing.T) {
 	h := testHandler()
 	input := model.UserInfo{Sub: "marvin", Expiry: time.Now().Add(time.Second).Unix()}
-	h.userClaims = func(userInfo model.UserInfo) (jwt.Claims, error) {
+	h.userClaims = func(ctx context.Context, userInfo model.UserInfo) (jwt.Claims, error) {
 		return customClaims{"sub": "Zappod", "origin": "fake", "exp": userInfo.Expiry}, nil
 	}
-	token, err := h.createToken(input)
+	token, err := h.createToken(context.Background(), input)
 
 	NoError(t, err)
 	r := &http.Request{

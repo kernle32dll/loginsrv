@@ -1,6 +1,7 @@
 package oauth2
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -33,7 +34,7 @@ var providerfacebook = Provider{
 	AuthURL:       "https://www.facebook.com/v2.12/dialog/oauth",
 	TokenURL:      "https://graph.facebook.com/v2.12/oauth/access_token",
 	DefaultScopes: "email",
-	GetUserInfo: func(token TokenInfo) (model.UserInfo, string, error) {
+	GetUserInfo: func(ctx context.Context, token TokenInfo) (model.UserInfo, string, error) {
 		fu := facebookUser{}
 
 		url := fmt.Sprintf("%v/me?access_token=%v&fields=name,email,id,picture", facebookAPI, token.AccessToken)
@@ -41,7 +42,7 @@ var providerfacebook = Provider{
 		// For facebook return an application/json Content-type the Accept header should be set as 'application/json'
 		client := &http.Client{}
 		contentType := "application/json"
-		req, _ := http.NewRequest("GET", url, nil)
+		req, _ := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 		req.Header.Set("Accept", contentType)
 		resp, err := client.Do(req)
 

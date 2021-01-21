@@ -1,6 +1,7 @@
 package login
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -46,7 +47,7 @@ func Test_userClaimsProvider_Claims(t *testing.T) {
 	provider, err := newUserClaimsProvider(mock.URL+endpointPath, token, time.Minute)
 	require.NoError(t, err)
 
-	claims, err := provider.Claims(model.UserInfo{
+	claims, err := provider.Claims(context.Background(), model.UserInfo{
 		Sub:    "test@example.com",
 		Origin: "origin",
 		Domain: "example.com",
@@ -90,7 +91,7 @@ func Test_userClaimsProvider_Claims_NotFound(t *testing.T) {
 	provider, err := newUserClaimsProvider(mock.URL+endpointPath, token, time.Minute)
 	require.NoError(t, err)
 
-	claims, err := provider.Claims(model.UserInfo{
+	claims, err := provider.Claims(context.Background(), model.UserInfo{
 		Sub:    "test@example.com",
 		Origin: "origin",
 		Domain: "example.com",
@@ -112,7 +113,7 @@ func Test_userClaimsProvider_Claims_EndpointNotReachable(t *testing.T) {
 	provider, err := newUserClaimsProvider("http://not-exists.example.com", token, time.Millisecond)
 	require.NoError(t, err)
 
-	_, err = provider.Claims(aUserInfo)
+	_, err = provider.Claims(context.Background(), aUserInfo)
 
 	assert.Error(t, err)
 }
@@ -145,7 +146,7 @@ func Test_userClaimsProvider_Claims_Errors(t *testing.T) {
 			provider, err := newUserClaimsProvider(mock.URL+endpointPath, token, time.Minute)
 			require.NoError(t, err)
 
-			_, err = provider.Claims(aUserInfo)
+			_, err = provider.Claims(context.Background(), aUserInfo)
 
 			assert.Error(t, err)
 		})

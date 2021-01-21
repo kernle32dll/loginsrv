@@ -1,6 +1,7 @@
 package oauth2
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -32,12 +33,16 @@ var providerGitlab = Provider{
 	Name:     "gitlab",
 	AuthURL:  "https://gitlab.com/oauth/authorize",
 	TokenURL: "https://gitlab.com/oauth/token",
-	GetUserInfo: func(token TokenInfo) (model.UserInfo, string, error) {
+	GetUserInfo: func(ctx context.Context, token TokenInfo) (model.UserInfo, string, error) {
 		gu := GitlabUser{}
 		url := fmt.Sprintf("%v/user?access_token=%v", gitlabAPI, token.AccessToken)
 
-		var respUser *http.Response
-		respUser, err := http.Get(url)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+		if err != nil {
+			return model.UserInfo{}, "", err
+		}
+
+		respUser, err := http.DefaultClient.Do(req)
 		if err != nil {
 			return model.UserInfo{}, "", err
 		}
@@ -61,7 +66,7 @@ var providerGitlab = Provider{
 			return model.UserInfo{}, "", fmt.Errorf("error parsing gitlab get user info: %v", err)
 		}
 
-		gg := []*GitlabGroup{}
+		var gg []*GitlabGroup
 		url = fmt.Sprintf("%v/groups?access_token=%v", gitlabAPI, token.AccessToken)
 
 		var respGroup *http.Response

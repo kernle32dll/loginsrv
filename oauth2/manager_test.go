@@ -1,6 +1,7 @@
 package oauth2
 
 import (
+	"context"
 	"crypto/tls"
 	"errors"
 	"net/http"
@@ -20,7 +21,7 @@ func Test_Manager_Positive_Flow(t *testing.T) {
 		Name:     "example",
 		AuthURL:  "https://example.com/login/oauth/authorize",
 		TokenURL: "https://example.com/login/oauth/access_token",
-		GetUserInfo: func(token TokenInfo) (model.UserInfo, string, error) {
+		GetUserInfo: func(ctx context.Context, token TokenInfo) (model.UserInfo, string, error) {
 			getUserInfoCalled = true
 			Equal(t, token, expectedToken)
 			return model.UserInfo{
@@ -96,7 +97,7 @@ func Test_Manager_NoAauthOnWrongCode(t *testing.T) {
 		Name:     "example",
 		AuthURL:  "https://example.com/login/oauth/authorize",
 		TokenURL: "https://example.com/login/oauth/access_token",
-		GetUserInfo: func(token TokenInfo) (model.UserInfo, string, error) {
+		GetUserInfo: func(ctx context.Context, token TokenInfo) (model.UserInfo, string, error) {
 			getUserInfoCalled = true
 			return model.UserInfo{}, "", nil
 		},

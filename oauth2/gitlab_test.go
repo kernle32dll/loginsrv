@@ -1,6 +1,7 @@
 package oauth2
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"regexp"
@@ -97,7 +98,7 @@ func Test_Gitlab_getUserInfo(t *testing.T) {
 
 	gitlabAPI = server.URL
 
-	u, rawJSON, err := providerGitlab.GetUserInfo(TokenInfo{AccessToken: "secret"})
+	u, rawJSON, err := providerGitlab.GetUserInfo(context.Background(), TokenInfo{AccessToken: "secret"})
 	NoError(t, err)
 	Equal(t, "john_smith", u.Sub)
 	Equal(t, "john@example.com", u.Email)
@@ -109,7 +110,7 @@ func Test_Gitlab_getUserInfo(t *testing.T) {
 func Test_Gitlab_getUserInfo_NoServer(t *testing.T) {
 	gitlabAPI = "http://localhost:1234"
 
-	u, rawJSON, err := providerGitlab.GetUserInfo(TokenInfo{AccessToken: "secret"})
+	u, rawJSON, err := providerGitlab.GetUserInfo(context.Background(), TokenInfo{AccessToken: "secret"})
 	Equal(t, model.UserInfo{}, u)
 	Empty(t, rawJSON)
 	Error(t, err)
@@ -132,7 +133,7 @@ func Test_Gitlab_getUserInfo_UserContentTypeNegative(t *testing.T) {
 
 	gitlabAPI = server.URL
 
-	u, rawJSON, err := providerGitlab.GetUserInfo(TokenInfo{AccessToken: "secret"})
+	u, rawJSON, err := providerGitlab.GetUserInfo(context.Background(), TokenInfo{AccessToken: "secret"})
 	Equal(t, model.UserInfo{}, u)
 	Empty(t, rawJSON)
 	Error(t, err)
@@ -155,7 +156,7 @@ func Test_Gitlab_getUserInfo_GroupsContentTypeNegative(t *testing.T) {
 
 	gitlabAPI = server.URL
 
-	u, rawJSON, err := providerGitlab.GetUserInfo(TokenInfo{AccessToken: "secret"})
+	u, rawJSON, err := providerGitlab.GetUserInfo(context.Background(), TokenInfo{AccessToken: "secret"})
 	Equal(t, model.UserInfo{}, u)
 	Empty(t, rawJSON)
 	Error(t, err)
@@ -179,7 +180,7 @@ func Test_Gitlab_getUserInfo_UserStatusCodeNegative(t *testing.T) {
 
 	gitlabAPI = server.URL
 
-	u, rawJSON, err := providerGitlab.GetUserInfo(TokenInfo{AccessToken: "secret"})
+	u, rawJSON, err := providerGitlab.GetUserInfo(context.Background(), TokenInfo{AccessToken: "secret"})
 	Equal(t, model.UserInfo{}, u)
 	Empty(t, rawJSON)
 	Error(t, err)
@@ -203,7 +204,7 @@ func Test_Gitlab_getUserInfo_GroupsStatusCodeNegative(t *testing.T) {
 
 	gitlabAPI = server.URL
 
-	u, rawJSON, err := providerGitlab.GetUserInfo(TokenInfo{AccessToken: "secret"})
+	u, rawJSON, err := providerGitlab.GetUserInfo(context.Background(), TokenInfo{AccessToken: "secret"})
 	Equal(t, model.UserInfo{}, u)
 	Empty(t, rawJSON)
 	Error(t, err)
@@ -226,7 +227,7 @@ func Test_Gitlab_getUserInfo_UserJSONNegative(t *testing.T) {
 
 	gitlabAPI = server.URL
 
-	u, rawJSON, err := providerGitlab.GetUserInfo(TokenInfo{AccessToken: "secret"})
+	u, rawJSON, err := providerGitlab.GetUserInfo(context.Background(), TokenInfo{AccessToken: "secret"})
 	Equal(t, model.UserInfo{}, u)
 	Empty(t, rawJSON)
 	Error(t, err)
@@ -249,7 +250,7 @@ func Test_Gitlab_getUserInfo_GroupsJSONNegative(t *testing.T) {
 
 	gitlabAPI = server.URL
 
-	u, rawJSON, err := providerGitlab.GetUserInfo(TokenInfo{AccessToken: "secret"})
+	u, rawJSON, err := providerGitlab.GetUserInfo(context.Background(), TokenInfo{AccessToken: "secret"})
 	Equal(t, model.UserInfo{}, u)
 	Empty(t, rawJSON)
 	Error(t, err)

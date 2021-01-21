@@ -1,6 +1,8 @@
 package oauth2
 
 import (
+	"context"
+
 	"github.com/tarent/loginsrv/model"
 )
 
@@ -23,7 +25,7 @@ type Provider struct {
 	// for fetching the user information.
 	// Possible keys in the returned map are:
 	// username, email, name
-	GetUserInfo func(token TokenInfo) (u model.UserInfo, rawUserJson string, err error)
+	GetUserInfo func(ctx context.Context, token TokenInfo) (u model.UserInfo, rawUserJson string, err error)
 }
 
 var provider = map[string]Provider{}

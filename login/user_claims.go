@@ -1,6 +1,7 @@
 package login
 
 import (
+	"context"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -28,7 +29,7 @@ func (custom customClaims) merge(values map[string]interface{}) {
 }
 
 type UserClaims interface {
-	Claims(userInfo model.UserInfo) (jwt.Claims, error)
+	Claims(ctx context.Context, userInfo model.UserInfo) (jwt.Claims, error)
 }
 
 func NewUserClaims(config *Config) (UserClaims, error) {

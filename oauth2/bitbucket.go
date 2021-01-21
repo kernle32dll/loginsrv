@@ -1,6 +1,7 @@
 package oauth2
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -94,10 +95,16 @@ var providerBitbucket = Provider{
 	Name:     "bitbucket",
 	AuthURL:  "https://bitbucket.org/site/oauth2/authorize",
 	TokenURL: "https://bitbucket.org/site/oauth2/access_token",
-	GetUserInfo: func(token TokenInfo) (model.UserInfo, string, error) {
+	GetUserInfo: func(ctx context.Context, token TokenInfo) (model.UserInfo, string, error) {
 		gu := bitbucketUser{}
 		url := fmt.Sprintf("%v/user?access_token=%v", bitbucketAPI, token.AccessToken)
-		resp, err := http.Get(url)
+
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+		if err != nil {
+			return model.UserInfo{}, "", err
+		}
+
+		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
 			return model.UserInfo{}, "", err
 		}
@@ -117,12 +124,14 @@ var providerBitbucket = Provider{
 		}
 
 		err = json.Unmarshal(b, &gu)
-
 		if err != nil {
 			return model.UserInfo{}, "", fmt.Errorf("error parsing bitbucket get user info: %v", err)
 		}
 
 		userEmails, err := getBitbucketEmails(token)
+		if err != nil {
+			return model.UserInfo{}, "", fmt.Errorf("error reading bitbucket get emails: %v", err)
+		}
 
 		return model.UserInfo{
 			Sub:     gu.Username,

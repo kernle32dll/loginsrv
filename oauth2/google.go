@@ -1,6 +1,7 @@
 package oauth2
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -9,7 +10,6 @@ import (
 
 	"github.com/tarent/loginsrv/model"
 )
-
 
 var googleUserinfoEndpoint = "https://www.googleapis.com/oauth2/v3/userinfo"
 
@@ -30,11 +30,16 @@ var providerGoogle = Provider{
 	AuthURL:       "https://accounts.google.com/o/oauth2/v2/auth",
 	TokenURL:      "https://www.googleapis.com/oauth2/v4/token",
 	DefaultScopes: "email profile",
-	GetUserInfo: func(token TokenInfo) (model.UserInfo, string, error) {
+	GetUserInfo: func(ctx context.Context, token TokenInfo) (model.UserInfo, string, error) {
 		gu := GoogleUser{}
 		url := fmt.Sprintf("%v?access_token=%v", googleUserinfoEndpoint, token.AccessToken)
-		resp, err := http.Get(url)
 
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+		if err != nil {
+			return model.UserInfo{}, "", err
+		}
+
+		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
 			return model.UserInfo{}, "", err
 		}

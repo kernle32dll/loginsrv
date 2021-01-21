@@ -1,6 +1,7 @@
 package oauth2
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -32,7 +33,7 @@ func Test_Google_getUserInfo(t *testing.T) {
 
 	googleUserinfoEndpoint = server.URL
 
-	u, rawJSON, err := providerGoogle.GetUserInfo(TokenInfo{AccessToken: "secret"})
+	u, rawJSON, err := providerGoogle.GetUserInfo(context.Background(), TokenInfo{AccessToken: "secret"})
 	NoError(t, err)
 	Equal(t, "test@example.com", u.Sub)
 	Equal(t, "test@example.com", u.Email)

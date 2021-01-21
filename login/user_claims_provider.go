@@ -1,6 +1,7 @@
 package login
 
 import (
+	"context"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -30,9 +31,9 @@ func newUserClaimsProvider(url, auth string, timeout time.Duration) (*userClaims
 	}, nil
 }
 
-func (provider *userClaimsProvider) Claims(userInfo model.UserInfo) (jwt.Claims, error) {
+func (provider *userClaimsProvider) Claims(ctx context.Context, userInfo model.UserInfo) (jwt.Claims, error) {
 	claimsURL := provider.buildURL(userInfo)
-	req, _ := http.NewRequest(http.MethodGet, claimsURL, nil)
+	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, claimsURL, nil)
 	if provider.auth != "" {
 		req.Header.Add("Authorization", "Bearer "+provider.auth)
 	}

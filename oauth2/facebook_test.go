@@ -1,10 +1,12 @@
 package oauth2
 
 import (
-	. "github.com/stretchr/testify/assert"
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	. "github.com/stretchr/testify/assert"
 )
 
 var facebookTestUserResponse = `{
@@ -31,7 +33,7 @@ func Test_Facebook_getUserInfo(t *testing.T) {
 
 	facebookAPI = server.URL
 
-	u, rawJSON, err := providerfacebook.GetUserInfo(TokenInfo{AccessToken: "secret"})
+	u, rawJSON, err := providerfacebook.GetUserInfo(context.Background(), TokenInfo{AccessToken: "secret"})
 	NoError(t, err)
 	Equal(t, "23456789012345678", u.Sub)
 	Equal(t, "facebookuser@facebook.com", u.Email)
@@ -49,7 +51,7 @@ func Test_Facebook_getUserInfo_WrongContentType(t *testing.T) {
 
 	facebookAPI = server.URL
 
-	_, _, err := providerfacebook.GetUserInfo(TokenInfo{AccessToken: "secret"})
+	_, _, err := providerfacebook.GetUserInfo(context.Background(), TokenInfo{AccessToken: "secret"})
 	Error(t, err)
 }
 
@@ -63,6 +65,6 @@ func Test_Facebook_getUserInfo_WrongStatus(t *testing.T) {
 
 	facebookAPI = server.URL
 
-	_, _, err := providerfacebook.GetUserInfo(TokenInfo{AccessToken: "secret"})
+	_, _, err := providerfacebook.GetUserInfo(context.Background(), TokenInfo{AccessToken: "secret"})
 	Error(t, err)
 }

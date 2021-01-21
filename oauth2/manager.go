@@ -55,7 +55,7 @@ func (manager *Manager) Handle(w http.ResponseWriter, r *http.Request) (
 			return false, false, model.UserInfo{}, err
 		}
 
-		userInfo, _, err := cfg.Provider.GetUserInfo(tokenInfo)
+		userInfo, _, err := cfg.Provider.GetUserInfo(r.Context(), tokenInfo)
 		if err != nil {
 			return false, false, model.UserInfo{}, err
 		}
