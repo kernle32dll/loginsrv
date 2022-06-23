@@ -3,7 +3,7 @@ package login
 import (
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/kernle32dll/loginsrv/model"
 	"github.com/pkg/errors"
 )

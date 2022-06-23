@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/kernle32dll/loginsrv/logging"
 	"github.com/kernle32dll/loginsrv/model"
 	"github.com/kernle32dll/loginsrv/oauth2"
