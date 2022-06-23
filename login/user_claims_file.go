@@ -4,8 +4,8 @@ import (
 	"io/ioutil"
 
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/kernle32dll/loginsrv/model"
 	"github.com/pkg/errors"
-	"github.com/tarent/loginsrv/model"
 	yaml "gopkg.in/yaml.v2"
 )
 

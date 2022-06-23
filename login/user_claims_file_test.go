@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/kernle32dll/loginsrv/model"
 	. "github.com/stretchr/testify/assert"
-	"github.com/tarent/loginsrv/model"
 )
 
 var claimsExample = `

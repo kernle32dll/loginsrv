@@ -1,8 +1,8 @@
 package htpasswd
 
 import (
+	"github.com/kernle32dll/loginsrv/login"
 	. "github.com/stretchr/testify/assert"
-	"github.com/tarent/loginsrv/login"
 	"os"
 	"strings"
 	"testing"

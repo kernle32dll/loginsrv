@@ -9,10 +9,10 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/kernle32dll/loginsrv/logging"
+	"github.com/kernle32dll/loginsrv/model"
+	"github.com/kernle32dll/loginsrv/oauth2"
 	"github.com/pkg/errors"
-	"github.com/tarent/loginsrv/logging"
-	"github.com/tarent/loginsrv/model"
-	"github.com/tarent/loginsrv/oauth2"
 )
 
 const contentTypeHTML = "text/html; charset=utf-8"

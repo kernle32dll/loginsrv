@@ -10,14 +10,14 @@ import (
 
 	"github.com/caddyserver/caddy"
 	"github.com/caddyserver/caddy/caddyhttp/httpserver"
-	"github.com/tarent/loginsrv/logging"
-	"github.com/tarent/loginsrv/login"
+	"github.com/kernle32dll/loginsrv/logging"
+	"github.com/kernle32dll/loginsrv/login"
 
 	// Import all backends, packaged with the caddy plugin
-	_ "github.com/tarent/loginsrv/htpasswd"
-	_ "github.com/tarent/loginsrv/httpupstream"
-	_ "github.com/tarent/loginsrv/oauth2"
-	_ "github.com/tarent/loginsrv/osiam"
+	_ "github.com/kernle32dll/loginsrv/htpasswd"
+	_ "github.com/kernle32dll/loginsrv/httpupstream"
+	_ "github.com/kernle32dll/loginsrv/oauth2"
+	_ "github.com/kernle32dll/loginsrv/osiam"
 )
 
 func init() {

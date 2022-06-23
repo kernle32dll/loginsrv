@@ -10,8 +10,8 @@ import (
 
 	"github.com/caddyserver/caddy"
 	"github.com/caddyserver/caddy/caddyhttp/httpserver"
+	"github.com/kernle32dll/loginsrv/login"
 	. "github.com/stretchr/testify/assert"
-	"github.com/tarent/loginsrv/login"
 )
 
 func TestSetup(t *testing.T) {

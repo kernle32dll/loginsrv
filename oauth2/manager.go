@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/tarent/loginsrv/model"
+	"github.com/kernle32dll/loginsrv/model"
 )
 
 // Manager has the responsibility to handle the user user requests in an oauth flow.

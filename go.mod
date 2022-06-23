@@ -1,4 +1,4 @@
-module github.com/tarent/loginsrv
+module github.com/kernle32dll/loginsrv
 
 go 1.14
 

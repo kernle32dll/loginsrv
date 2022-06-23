@@ -6,10 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/caddyserver/caddy/caddyhttp/httpserver"
-	"github.com/tarent/loginsrv/login"
-	"github.com/tarent/loginsrv/model"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/kernle32dll/loginsrv/login"
+	"github.com/kernle32dll/loginsrv/model"
 )
 
 //Tests a page while being logged in as a user (doesn't test that the {user} replacer changes)

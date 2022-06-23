@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/kernle32dll/loginsrv/oauth2"
 	. "github.com/stretchr/testify/assert"
-	"github.com/tarent/loginsrv/oauth2"
 	"io/ioutil"
 )
 

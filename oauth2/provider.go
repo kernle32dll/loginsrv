@@ -1,7 +1,7 @@
 package oauth2
 
 import (
-	"github.com/tarent/loginsrv/model"
+	"github.com/kernle32dll/loginsrv/model"
 )
 
 // Provider is the description of an oauth provider adapter

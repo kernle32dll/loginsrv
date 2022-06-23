@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/kernle32dll/loginsrv/model"
 	. "github.com/stretchr/testify/assert"
-	"github.com/tarent/loginsrv/model"
 )
 
 func Test_Manager_Positive_Flow(t *testing.T) {

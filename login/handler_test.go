@@ -17,9 +17,9 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/kernle32dll/loginsrv/model"
+	"github.com/kernle32dll/loginsrv/oauth2"
 	. "github.com/stretchr/testify/assert"
-	"github.com/tarent/loginsrv/model"
-	"github.com/tarent/loginsrv/oauth2"
 )
 
 const TypeJSON = "Content-Type: application/json"

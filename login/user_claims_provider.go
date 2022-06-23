@@ -8,8 +8,8 @@ import (
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/kernle32dll/loginsrv/model"
 	"github.com/pkg/errors"
-	"github.com/tarent/loginsrv/model"
 )
 
 type userClaimsProvider struct {

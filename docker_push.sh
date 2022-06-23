@@ -1,5 +1,5 @@
 #!/bin/bash
 
-docker build -t tarent/loginsrv . ;
+docker build -t kernle32dll/loginsrv . ;
 docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" ;
-docker push tarent/loginsrv ;
+docker push kernle32dll/loginsrv ;

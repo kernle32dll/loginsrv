@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/tarent/loginsrv/logging"
-	"github.com/tarent/loginsrv/model"
+	"github.com/kernle32dll/loginsrv/logging"
+	"github.com/kernle32dll/loginsrv/model"
 )
 
 const partials = `

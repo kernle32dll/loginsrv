@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/tarent/loginsrv/logging"
-	"github.com/tarent/loginsrv/oauth2"
+	"github.com/kernle32dll/loginsrv/logging"
+	"github.com/kernle32dll/loginsrv/oauth2"
 )
 
 var jwtDefaultSecret string
