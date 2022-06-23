@@ -100,18 +100,18 @@ func (h *Handler) handleOauth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		logging.Application(r.Header).WithError(err).Error()
+		logging.Application().WithError(err).Error()
 		h.respondError(w, r)
 		return
 	}
 
 	if authenticated {
-		logging.Application(r.Header).
+		logging.Application().
 			WithField("username", userInfo.Sub).Info("successfully authenticated")
 		h.respondAuthenticated(w, r, userInfo)
 		return
 	}
-	logging.Application(r.Header).
+	logging.Application().
 		WithField("username", userInfo.Sub).Info("failed authentication")
 
 	h.respondAuthFailure(w, r)
@@ -194,18 +194,18 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) handleAuthentication(w http.ResponseWriter, r *http.Request, username string, password string) {
 	authenticated, userInfo, err := h.authenticate(username, password)
 	if err != nil {
-		logging.Application(r.Header).WithError(err).Error()
+		logging.Application().WithError(err).Error()
 		h.respondError(w, r)
 		return
 	}
 
 	if authenticated {
-		logging.Application(r.Header).
+		logging.Application().
 			WithField("username", username).Info("successfully authenticated")
 		h.respondAuthenticated(w, r, userInfo)
 		return
 	}
-	logging.Application(r.Header).
+	logging.Application().
 		WithField("username", username).Info("failed authentication")
 
 	h.respondAuthFailure(w, r)
@@ -217,7 +217,7 @@ func (h *Handler) handleRefresh(w http.ResponseWriter, r *http.Request, userInfo
 	} else {
 		userInfo.Refreshes++
 		h.respondAuthenticated(w, r, userInfo)
-		logging.Application(r.Header).WithField("username", userInfo.Sub).Info("refreshed jwt")
+		logging.Application().WithField("username", userInfo.Sub).Info("refreshed jwt")
 	}
 }
 
@@ -239,7 +239,7 @@ func (h *Handler) respondAuthenticated(w http.ResponseWriter, r *http.Request, u
 	userInfo.Expiry = time.Now().Add(h.config.JwtExpiry).Unix()
 	token, err := h.createToken(userInfo)
 	if err != nil {
-		logging.Application(r.Header).WithError(err).Error()
+		logging.Application().WithError(err).Error()
 		h.respondError(w, r)
 		return
 	}

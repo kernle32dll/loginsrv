@@ -46,11 +46,11 @@ func (h *Handler) allowRedirect(r *http.Request) bool {
 
 	referer, err := url.Parse(r.Header.Get("Referer"))
 	if err != nil {
-		logging.Application(r.Header).Warnf("couldn't parse redirect url %s", err)
+		logging.Application().Warnf("couldn't parse redirect url %s", err)
 		return false
 	}
 	if referer.Host != r.Host {
-		logging.Application(r.Header).Warnf("redirect from referer domain: '%s', not matching current domain '%s'", referer.Host, r.Host)
+		logging.Application().Warnf("redirect from referer domain: '%s', not matching current domain '%s'", referer.Host, r.Host)
 		return false
 	}
 	return true
@@ -75,7 +75,7 @@ func (h *Handler) getRedirectTarget(r *http.Request) (*url.URL, bool) {
 	if err == nil {
 		url, err := url.Parse(cookie.Value)
 		if err != nil {
-			logging.Application(r.Header).Warnf("error parsing redirect URL: %s", err)
+			logging.Application().Warnf("error parsing redirect URL: %s", err)
 			return nil, false
 		}
 		return url, true
@@ -88,7 +88,7 @@ func (h *Handler) getRedirectTarget(r *http.Request) (*url.URL, bool) {
 	}
 	url, err := url.Parse(redirectTo)
 	if err != nil {
-		logging.Application(r.Header).Warnf("error parsing redirect URL: %s", err)
+		logging.Application().Warnf("error parsing redirect URL: %s", err)
 		return nil, false
 	}
 	return url, true
@@ -96,13 +96,13 @@ func (h *Handler) getRedirectTarget(r *http.Request) (*url.URL, bool) {
 
 func (h *Handler) isRedirectDomainWhitelisted(r *http.Request, host string) bool {
 	if h.config.RedirectHostFile == "" {
-		logging.Application(r.Header).Warnf("redirect attempt to '%s', but no whitelist domain file given", host)
+		logging.Application().Warnf("redirect attempt to '%s', but no whitelist domain file given", host)
 		return false
 	}
 
 	f, err := os.Open(h.config.RedirectHostFile)
 	if err != nil {
-		logging.Application(r.Header).Warnf("can't open redirect whitelist domains file '%s'", h.config.RedirectHostFile)
+		logging.Application().Warnf("can't open redirect whitelist domains file '%s'", h.config.RedirectHostFile)
 		return false
 	}
 	defer f.Close()
@@ -113,6 +113,6 @@ func (h *Handler) isRedirectDomainWhitelisted(r *http.Request, host string) bool
 			return true
 		}
 	}
-	logging.Application(r.Header).Warnf("redirect attempt to '%s', but not in redirect whitelist", host)
+	logging.Application().Warnf("redirect attempt to '%s', but not in redirect whitelist", host)
 	return false
 }

@@ -13,22 +13,20 @@ import (
 )
 
 type logReccord struct {
-	Type              string            `json:"type"`
-	Timestamp         string            `json:"@timestamp"`
-	CorrelationId     string            `json:"correlation_id"`
-	RemoteIp          string            `json:"remote_ip"`
-	Host              string            `json:"host"`
-	URL               string            `json:"url"`
-	Method            string            `json:"method"`
-	Proto             string            `json:"proto"`
-	Duration          int               `json:"duration"`
-	ResponseStatus    int               `json:"response_status"`
-	UserCorrelationId string            `json:"user_correlation_id"`
-	Cookies           map[string]string `json:"cookies"`
-	Error             string            `json:"error"`
-	Message           string            `json:"message"`
-	Level             string            `json:"level"`
-	UserAgent         string            `json:"User_Agent"`
+	Type           string            `json:"type"`
+	Timestamp      string            `json:"@timestamp"`
+	RemoteIp       string            `json:"remote_ip"`
+	Host           string            `json:"host"`
+	URL            string            `json:"url"`
+	Method         string            `json:"method"`
+	Proto          string            `json:"proto"`
+	Duration       int               `json:"duration"`
+	ResponseStatus int               `json:"response_status"`
+	Cookies        map[string]string `json:"cookies"`
+	Error          string            `json:"error"`
+	Message        string            `json:"message"`
+	Level          string            `json:"level"`
+	UserAgent      string            `json:"User_Agent"`
 }
 
 func Test_Logger_Set(t *testing.T) {
@@ -63,13 +61,11 @@ func Test_Logger_Call(t *testing.T) {
 	b := bytes.NewBuffer(nil)
 	Logger.Out = b
 	AccessLogCookiesBlacklist = []string{"ignore", "user_id"}
-	UserCorrelationCookie = "user_id"
 
 	// and a request
 	r, _ := http.NewRequest("GET", "http://www.example.org/foo?q=bar", nil)
 	r.Header = http.Header{
-		CorrelationIdHeader: {"correlation-123"},
-		"Cookie":            {"user_id=user-id-xyz; ignore=me; foo=bar;"},
+		"Cookie": {"user_id=user-id-xyz; ignore=me; foo=bar;"},
 	}
 
 	resp := &http.Response{
@@ -87,8 +83,6 @@ func Test_Logger_Call(t *testing.T) {
 	a.NoError(err)
 
 	a.Equal("warning", data.Level)
-	a.Equal("correlation-123", data.CorrelationId)
-	a.Equal("user-id-xyz", data.UserCorrelationId)
 	a.InDelta(1000, data.Duration, 0.5)
 	a.Equal("", data.Error)
 	a.Equal("www.example.org", data.Host)
@@ -111,8 +105,6 @@ func Test_Logger_Call(t *testing.T) {
 	a.Equal("error", data.Level)
 	a.Equal("oops", data.Error)
 	a.Equal("oops", data.Message)
-	a.Equal("correlation-123", data.CorrelationId)
-	a.Equal("user-id-xyz", data.UserCorrelationId)
 	a.InDelta(1000, data.Duration, 0.5)
 	a.Equal("www.example.org", data.Host)
 	a.Equal("GET", data.Method)
@@ -127,16 +119,14 @@ func Test_Logger_Access(t *testing.T) {
 	b := bytes.NewBuffer(nil)
 	Logger.Out = b
 	AccessLogCookiesBlacklist = []string{"ignore", "user_id"}
-	UserCorrelationCookie = "user_id"
 
 	// Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.84 Safari/537.36
 
 	// and a request
 	r, _ := http.NewRequest("GET", "http://www.example.org/foo?q=bar", nil)
 	r.Header = http.Header{
-		CorrelationIdHeader: {"correlation-123"},
-		"Cookie":            {"user_id=user-id-xyz; ignore=me; foo=bar;"},
-		"User-Agent":        {"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.84 Safari/537.36"},
+		"Cookie":     {"user_id=user-id-xyz; ignore=me; foo=bar;"},
+		"User-Agent": {"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.84 Safari/537.36"},
 	}
 	r.RemoteAddr = "127.0.0.1"
 
@@ -151,7 +141,6 @@ func Test_Logger_Access(t *testing.T) {
 
 	a.Equal("info", data.Level)
 	a.Equal(map[string]string{"foo": "bar"}, data.Cookies)
-	a.Equal("correlation-123", data.CorrelationId)
 	a.InDelta(1000, data.Duration, 0.5)
 	a.Equal("", data.Error)
 	a.Equal("www.example.org", data.Host)
@@ -162,7 +151,6 @@ func Test_Logger_Access(t *testing.T) {
 	a.Equal(201, data.ResponseStatus)
 	a.Equal("access", data.Type)
 	a.Equal("/foo?q=bar", data.URL)
-	a.Equal("user-id-xyz", data.UserCorrelationId)
 	a.Equal("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.84 Safari/537.36", data.UserAgent)
 }
 
@@ -203,19 +191,11 @@ func Test_Logger_Access_ErrorCases(t *testing.T) {
 func Test_Logger_Application(t *testing.T) {
 	a := assert.New(t)
 
-	// given:
-	UserCorrelationCookie = "user_id"
-	header := http.Header{
-		CorrelationIdHeader: {"correlation-123"},
-		"Cookie":            {"user_id=user-id-xyz;"},
-	}
-
 	// when:
-	entry := Application(header)
+	entry := Application()
 
 	// then:
-	a.Equal("correlation-123", entry.Data["correlation_id"])
-	a.Equal("user-id-xyz", entry.Data["user_correlation_id"])
+	a.Equal("application", entry.Data["type"])
 }
 
 func Test_Logger_LifecycleStart(t *testing.T) {

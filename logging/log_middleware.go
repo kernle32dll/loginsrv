@@ -19,7 +19,6 @@ func NewLogMiddleware(next http.Handler) *LogMiddleware {
 }
 
 func (mw *LogMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	EnsureCorrelationId(r)
 	start := time.Now()
 
 	defer func() {

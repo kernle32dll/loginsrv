@@ -90,8 +90,6 @@ func access(r *http.Request, start time.Time, statusCode int, err error) *logrus
 		fields[logrus.ErrorKey] = err.Error()
 	}
 
-	setCorrelationIds(fields, r.Header)
-
 	cookies := map[string]string{}
 	for _, c := range r.Cookies() {
 		if !contains(AccessLogCookiesBlacklist, c.Name) {
@@ -120,8 +118,6 @@ func Call(r *http.Request, resp *http.Response, start time.Time, err error) {
 		"method":     r.Method,
 		"duration":   time.Since(start).Nanoseconds() / 1000000,
 	}
-
-	setCorrelationIds(fields, r.Header)
 
 	if err != nil {
 		fields[logrus.ErrorKey] = err.Error()
@@ -167,11 +163,10 @@ func Cacheinfo(url string, hit bool) {
 
 // Return a log entry for application logs,
 // prefilled with the correlation ids out of the supplied request.
-func Application(h http.Header) *logrus.Entry {
+func Application() *logrus.Entry {
 	fields := logrus.Fields{
 		"type": "application",
 	}
-	setCorrelationIds(fields, h)
 	return Logger.WithFields(fields)
 }
 
@@ -243,18 +238,6 @@ func getRemoteIp(r *http.Request) string {
 		return r.Header.Get("X-Real-Ip")
 	}
 	return strings.Split(r.RemoteAddr, ":")[0]
-}
-
-func setCorrelationIds(fields logrus.Fields, h http.Header) {
-	correlationId := GetCorrelationId(h)
-	if correlationId != "" {
-		fields["correlation_id"] = correlationId
-	}
-
-	userCorrelationId := GetUserCorrelationId(h)
-	if userCorrelationId != "" {
-		fields["user_correlation_id"] = userCorrelationId
-	}
 }
 
 func contains(s []string, e string) bool {
