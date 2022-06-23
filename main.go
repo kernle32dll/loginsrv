@@ -3,7 +3,6 @@ package main
 import (
 	_ "github.com/kernle32dll/loginsrv/htpasswd"
 	_ "github.com/kernle32dll/loginsrv/httpupstream"
-	_ "github.com/kernle32dll/loginsrv/osiam"
 
 	"github.com/kernle32dll/loginsrv/login"
 

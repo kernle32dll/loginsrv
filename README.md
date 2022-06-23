@@ -25,7 +25,6 @@ It can be used as:
 * Standalone microservice
 * Docker container
 * Golang library
-* [Caddy](http://caddyserver.com/) plugin.  (See [caddy/README.md](./caddy/README.md) for details)
 
 ![](.screenshot.png)
 
@@ -33,7 +32,6 @@ It can be used as:
 The following providers (login backends) are supported.
 
 * [Htpasswd](#htpasswd)
-* [OSIAM](#osiam)
 * [Simple](#simple) (user/password pairs by configuration)
 * [Httpupstream](#httpupstream)
 * [OAuth2](#oauth2)
@@ -43,54 +41,45 @@ The following providers (login backends) are supported.
   * Facebook login
   * Gitlab login
 
-## Questions
-
-For questions and support please use the [Gitter chat room](https://gitter.im/kernle32dll/loginsrv).
-
-[![Join the chat at https://gitter.im/kernle32dll/loginsrv](https://badges.gitter.im/kernle32dll/loginsrv.svg)](https://gitter.im/kernle32dll/loginsrv?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 ## Configuration and Startup
 ### Config Options
 
-_Note for Caddy users_: Not all parameters are available in Caddy. See the table for details. With Caddy, the parameter names can also be used with `_` in the names, e.g. `cookie_http_only`.
-
-| Parameter                   | Type        | Default      | Caddy | Description                                                                                           |
-|-----------------------------|-------------|--------------|-------|-------------------------------------------------------------------------------------------------------|
-| -cookie-domain              | string      |              | X     | Optional domain parameter for the cookie                                                              |
-| -cookie-expiry              | string      | session      | X     | Expiry duration for the cookie, e.g. 2h or 3h30m                                                      |
-| -cookie-http-only           | boolean     | true         | X     | Set the cookie with the HTTP only flag                                                                |
-| -cookie-name                | string      | "jwt_token"  | X     | Name of the JWT cookie                                                                                |
-| -cookie-secure              | boolean     | true         | X     | Set the secure flag on the JWT cookie. (Set this to false for plain HTTP support)                     |
-| -github                     | value       |              | X     | OAuth config in the form: client_id=..,client_secret=..[,scope=..][,redirect_uri=..]                  |
-| -google                     | value       |              | X     | OAuth config in the form: client_id=..,client_secret=..[,scope=..][,redirect_uri=..]                  |
-| -bitbucket                  | value       |              | X     | OAuth config in the form: client_id=..,client_secret=..[,scope=..][,redirect_uri=..]                  |
-| -facebook                   | value       |              | X     | OAuth config in the form: client_id=..,client_secret=..[,scope=..][,redirect_uri=..]                  |
-| -gitlab                     | value       |              | X     | OAuth config in the form: client_id=..,client_secret=..[,scope=..,][redirect_uri=..]                  |
-| -host                       | string      | "localhost"  | -     | Host to listen on                                                                                     |
-| -htpasswd                   | value       |              | X     | Htpasswd login backend opts: file=/path/to/pwdfile                                                    |
-| -jwt-expiry                 | go duration | 24h          | X     | Expiry duration for the JWT token, e.g. 2h or 3h30m                                                   |
-| -jwt-secret                 | string      | "random key" | X     | Secret used to sign the JWT token. (See [caddy/README.md](./caddy/README.md) for details.)            |
-| -jwt-secret-file            | string      |              | X     | File to load the jwt-secret from, e.g. `/run/secrets/some.key`. **Takes precedence over jwt-secret!** |
-| -jwt-algo                   | string      | "HS512"      | X     | Signing algorithm to use (ES256, ES384, ES512, RS256, RS384, RS512, HS256, HS384, HS512)              |
-| -log-level                  | string      | "info"       | -     | Log level                                                                                             |
-| -login-path                 | string      | "/login"     | X     | Path of the login resource                                                                            |
-| -logout-url                 | string      |              | X     | URL or path to redirect to after logout                                                               |
-| -osiam                      | value       |              | X     | OSIAM login backend opts: endpoint=..,client_id=..,client_secret=..                                   |
-| -port                       | string      | "6789"       | -     | Port to listen on                                                                                     |
-| -redirect                   | boolean     | true         | X     | Allow dynamic overwriting of the the success by query parameter                                       |
-| -redirect-query-parameter   | string      | "backTo"     | X     | URL parameter for the redirect target                                                                 |
-| -redirect-check-referer     | boolean     | true         | X     | Check the referer header to ensure it matches the host header on dynamic redirects                    |
-| -redirect-host-file         | string      | ""           | X     | A file containing a list of domains that redirects are allowed to, one domain per line                |
-| -simple                     | value       |              | X     | Simple login backend opts: user1=password,user2=password,..                                           |
-| -success-url                | string      | "/"          | X     | URL to redirect to after login                                                                        |
-| -template                   | string      |              | X     | An alternative template for the login form                                                            |
-| -text-logging               | boolean     | true         | -     | Log in text format instead of JSON                                                                    |
-| -jwt-refreshes              | int         | 0            | X     | The maximum number of JWT refreshes                                                                   |
-| -grace-period               | go duration | 5s           | -     | Duration to wait after SIGINT/SIGTERM for existing requests. No new requests are accepted.            |
-| -user-file                  | string      |              | X     | A YAML file with user specific data for the tokens. (see below for an example)                        |
-| -user-endpoint              | string      |              | X     | URL of an endpoint providing user specific data for the tokens. (see below for an example)            |
-| -user-endpoint-token        | string      |              | X     | Authentication token used when communicating with the user endpoint                                   |
-| -user-endpoint-timeout      | go duration | 5s           | X     | Timeout used when communicating with the user endpoint                                                |
+| Parameter                 | Type        | Default      | Description                                                                                           |
+|---------------------------|-------------|--------------|-------------------------------------------------------------------------------------------------------|
+| -cookie-domain            | string      |              | Optional domain parameter for the cookie                                                              |
+| -cookie-expiry            | string      | session      | Expiry duration for the cookie, e.g. 2h or 3h30m                                                      |
+| -cookie-http-only         | boolean     | true         | Set the cookie with the HTTP only flag                                                                |
+| -cookie-name              | string      | "jwt_token"  | Name of the JWT cookie                                                                                |
+| -cookie-secure            | boolean     | true         | Set the secure flag on the JWT cookie. (Set this to false for plain HTTP support)                     |
+| -github                   | value       |              | OAuth config in the form: client_id=..,client_secret=..[,scope=..][,redirect_uri=..]                  |
+| -google                   | value       |              | OAuth config in the form: client_id=..,client_secret=..[,scope=..][,redirect_uri=..]                  |
+| -bitbucket                | value       |              | OAuth config in the form: client_id=..,client_secret=..[,scope=..][,redirect_uri=..]                  |
+| -facebook                 | value       |              | OAuth config in the form: client_id=..,client_secret=..[,scope=..][,redirect_uri=..]                  |
+| -gitlab                   | value       |              | OAuth config in the form: client_id=..,client_secret=..[,scope=..,][redirect_uri=..]                  |
+| -host                     | string      | "localhost"  | Host to listen on                                                                                     |
+| -htpasswd                 | value       |              | Htpasswd login backend opts: file=/path/to/pwdfile                                                    |
+| -jwt-expiry               | go duration | 24h          | Expiry duration for the JWT token, e.g. 2h or 3h30m                                                   |
+| -jwt-secret               | string      | "random key" | Secret used to sign the JWT token.                                                                    |
+| -jwt-secret-file          | string      |              | File to load the jwt-secret from, e.g. `/run/secrets/some.key`. **Takes precedence over jwt-secret!** |
+| -jwt-algo                 | string      | "HS512"      | Signing algorithm to use (ES256, ES384, ES512, RS256, RS384, RS512, HS256, HS384, HS512)              |
+| -log-level                | string      | "info"       | Log level                                                                                             |
+| -login-path               | string      | "/login"     | Path of the login resource                                                                            |
+| -logout-url               | string      |              | URL or path to redirect to after logout                                                               |
+| -port                     | string      | "6789"       | Port to listen on                                                                                     |
+| -redirect                 | boolean     | true         | Allow dynamic overwriting of the the success by query parameter                                       |
+| -redirect-query-parameter | string      | "backTo"     | URL parameter for the redirect target                                                                 |
+| -redirect-check-referer   | boolean     | true         | Check the referer header to ensure it matches the host header on dynamic redirects                    |
+| -redirect-host-file       | string      | ""           | A file containing a list of domains that redirects are allowed to, one domain per line                |
+| -simple                   | value       |              | Simple login backend opts: user1=password,user2=password,..                                           |
+| -success-url              | string      | "/"          | URL to redirect to after login                                                                        |
+| -template                 | string      |              | An alternative template for the login form                                                            |
+| -text-logging             | boolean     | true         | Log in text format instead of JSON                                                                    |
+| -jwt-refreshes            | int         | 0            | The maximum number of JWT refreshes                                                                   |
+| -grace-period             | go duration | 5s           | Duration to wait after SIGINT/SIGTERM for existing requests. No new requests are accepted.            |
+| -user-file                | string      |              | A YAML file with user specific data for the tokens. (see below for an example)                        |
+| -user-endpoint            | string      |              | URL of an endpoint providing user specific data for the tokens. (see below for an example)            |
+| -user-endpoint-token      | string      |              | Authentication token used when communicating with the user endpoint                                   |
+| -user-endpoint-timeout    | go duration | 5s           | Timeout used when communicating with the user endpoint                                                |
 
 ### Environment Variables
 All of the above Config Options can also be applied as environment variables by using variables named this way: `LOGINSRV_OPTION_NAME`.
@@ -282,17 +271,6 @@ Example:
 ```sh
 loginsrv -httpupstream upstream=https://google.com,timeout=1s
 ```
-
-### OSIAM
-[OSIAM](https://github.com/osiam/osiam) is a secure identity management solution providing REST based services for authentication and authorization.
-It implements the multiple OAuth2 flows, as well as SCIM for managing the user data.
-
-To start loginsrv against the default OSIAM configuration on the same machine, use the following example.
-```sh
-loginsrv --jwt-secret=jwtsecret --text-logging -osiam endpoint=http://localhost:8080,client_id=example-client,client_secret=secret'
-```
-
-Then go to http://127.0.0.1:6789/login and login with `admin/koala`.
 
 ### Simple
 Simple is a demo provider for testing only. It holds a user/password table in memory.
