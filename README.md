@@ -1,21 +1,13 @@
 # loginsrv
 
+**NOTE**: This fork does not aim to be up-to-date with upstream anymore. For more details, see below.
+
 loginsrv is a standalone minimalistic login server providing a [JWT](https://jwt.io/) login for multiple login backends.
 
 [![Docker](https://img.shields.io/docker/pulls/kernle32dll/loginsrv.svg)](https://hub.docker.com/r/kernle32dll/loginsrv/)
 [![Build Status](https://github.com/kernle32dll/loginsrv/workflows/test/badge.svg)](https://github.com/kernle32dll/loginsrv/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/kernle32dll/loginsrv)](https://goreportcard.com/report/github.com/kernle32dll/loginsrv)
 [![Coverage Status](https://coveralls.io/repos/github/kernle32dll/loginsrv/badge.svg?branch=master)](https://coveralls.io/github/kernle32dll/loginsrv?branch=master)
-
-__** Attention: Update to v1.3.0 for Google Login Update !!!! **__
-
-Google will stop support for the Google+ APIs. So we changed loginsrv to use the standard oauth endpoints for Google login.
-Please update loginsrv to v1.3.0 if you are using google login.
-
-__** Attention: Since v1.3.0, pure HTTP is not supported by default **__
-
-Since v1.3.0, loginsrv sets the secure flag for the login cookie. So, if you use HTTP fo connect with the browser, e.g. for testing, you browser will ignore the cookie.
-Use the flag `-cookie-secure=false` when testing without HTTPS.
 
 ## Abstract
 
@@ -24,7 +16,6 @@ It can be used as:
 
 * Standalone microservice
 * Docker container
-* Golang library
 
 ![](.screenshot.png)
 
@@ -40,6 +31,35 @@ The following providers (login backends) are supported.
   * Bitbucket login
   * Facebook login
   * Gitlab login
+
+## Difference to tarent/loginsrv
+
+This fork is a re-start of the project, tailored to the authors needs. This fork is in no way supported by tarent!
+
+Version 1.4.0 is a trimmed down version of the latest master of tarent/loginsrv at the time of forking. Trimmed down means:
+
+- Removed support for Caddy (only v1 was supported, and it was breaking with dependency updates)
+- Removed support for OSIAM (unmaintained since 2019)
+- Removed support for correlation id
+- Replacement of [dgrijalva/jwt-go](https://github.com/dgrijalva/jwt-go) with [golang-jwt/jwt](https://github.com/golang-jwt/jwt)
+- Go 1.18 baseline
+- Up-to-date dependencies
+
+### Future
+
+There are at least two releases after 1.4.0 planned:
+
+#### 1.5.0 A maintenance release
+
+Fixing code problems, adding missing tests, and other quality-of-life improvements. Logging will be migrated from
+[sirupsen/logrus](https://github.com/sirupsen/logrus) to [rs/zerolog](https://github.com/rs/zerolog). Existing
+backends will be evaluated and tested to see if they are actually still working.
+
+#### 1.6.0 A feature release
+
+Planned features include more quality of life improvements, such as adding support for tracing via
+[open-telemetry](https://github.com/open-telemetry/opentelemetry-go) (as a replacement for the removed correlation id),
+as well as adding new features which did not make it into upstream loginsrv.
 
 ## Configuration and Startup
 ### Config Options
@@ -107,13 +127,10 @@ $ docker run -d -p 8080:8080 -E COOKIE_SECURE=false -e LOGINSRV_JWT_SECRET=my_se
 Per default, it returns a simple bootstrap styled login form for unauthenticated requests and a page with user info for authenticated requests.
 When the call accepts a JSON output, the json content of the token is returned to authenticated requests.
 
-The returned HTML follows the UI composition conventions from (lib-compose)[https://github.com/kernle32dll/lib-compose],
-so it can be embedded into an existing layout.
-
-| Parameter-Type    | Parameter                                        | Description                                                       |              | 
-| ------------------|--------------------------------------------------|-------------------------------------------------------------------|--------------|
-| Http-Header       | Accept: text/html                                | Return the login form or user html.                                | default      |
-| Http-Header       | Accept: application/json                         | Return the user Object as json, or 403 if not authenticated.      |              |
+| Parameter-Type | Parameter                | Description                                                  |         | 
+|----------------|--------------------------|--------------------------------------------------------------|---------|
+| Http-Header    | Accept: text/html        | Return the login form or user html.                          | default |
+| Http-Header    | Accept: application/json | Return the user Object as json, or 403 if not authenticated. |         |
 
 ### GET /login/<provider>
 
@@ -125,20 +142,20 @@ Performs the login and returns the JWT. Depending on the content-type and parame
 
 #### Runtime Parameters
 
-| Parameter-Type    | Parameter                                        | Description                                                       |              | 
-| ------------------|--------------------------------------------------|-------------------------------------------------------------------|--------------|
-| Http-Header       | Accept: text/html                                | Set the JWT as a cookie named 'jwt_token'                         | default      |
-| Http-Header       | Accept: application/jwt                          | Returns the JWT within the body. No cookie is set                 |              |
-| Http-Header       | Content-Type: application/x-www-form-urlencoded  | Expect the credentials as form encoded parameters                 | default      |
-| Http-Header       | Content-Type: application/json                   | Take the credentials from the provided JSON object                |              |
-| Post-Parameter    | username                                         | The username                                                      |              |
-| Post-Parameter    | password                                         | The password                                                      |              |
-| Get or Post       | backTo                                           | Dynamic redirect target after login (see (Redirects)[#redirects]) | -success-url |
+| Parameter-Type | Parameter                                       | Description                                                       |              | 
+|----------------|-------------------------------------------------|-------------------------------------------------------------------|--------------|
+| Http-Header    | Accept: text/html                               | Set the JWT as a cookie named 'jwt_token'                         | default      |
+| Http-Header    | Accept: application/jwt                         | Returns the JWT within the body. No cookie is set                 |              |
+| Http-Header    | Content-Type: application/x-www-form-urlencoded | Expect the credentials as form encoded parameters                 | default      |
+| Http-Header    | Content-Type: application/json                  | Take the credentials from the provided JSON object                |              |
+| Post-Parameter | username                                        | The username                                                      |              |
+| Post-Parameter | password                                        | The password                                                      |              |
+| Get or Post    | backTo                                          | Dynamic redirect target after login (see (Redirects)[#redirects]) | -success-url |
 
 #### Possible Return Codes
 
 | Code | Meaning               | Description                                                                                                               |
-|------| ----------------------|---------------------------------------------------------------------------------------------------------------------------|
+|------|-----------------------|---------------------------------------------------------------------------------------------------------------------------|
 | 200  | OK                    | Successfully authenticated                                                                                                |
 | 403  | Forbidden             | The credentials are wrong                                                                                                 |
 | 400  | Bad Request           | Missing parameters                                                                                                        |
@@ -247,9 +264,9 @@ Authentication against htpasswd file. MD5, SHA1 and Bcrypt are supported. But we
 
 Parameters for the provider:
 
-| Parameter-Name    | Description                |
-| ------------------|----------------------------|
-| file              | Path to the password file (multiple files can be used by separating them with ';')  |
+| Parameter-Name | Description                                                                        |
+|----------------|------------------------------------------------------------------------------------|
+| file           | Path to the password file (multiple files can be used by separating them with ';') |
 
 Example:
 ```sh
@@ -261,11 +278,11 @@ Authentication against an upstream HTTP server by performing a HTTP Basic authen
 
 Parameters for the provider:
 
-| Parameter-Name    | Description                                                               |
-| ------------------|---------------------------------------------------------------------------|
-| upstream          | HTTP/HTTPS URL to call                                                    |
-| skipverify        | True to ignore TLS errors (optional, false by default)                    |
-| timeout           | Request timeout (optional 1m by default, go duration syntax is supported) |
+| Parameter-Name | Description                                                               |
+|----------------|---------------------------------------------------------------------------|
+| upstream       | HTTP/HTTPS URL to call                                                    |
+| skipverify     | True to ignore TLS errors (optional, false by default)                    |
+| timeout        | Request timeout (optional 1m by default, go duration syntax is supported) |
 
 Example:
 ```sh
@@ -293,12 +310,12 @@ Currently the following OAuth provider is supported:
 
 An OAuth provider supports the following parameters:
 
-| Parameter-Name    | Description                            |
-| ------------------|----------------------------------------|
-| client_id         | OAuth Client ID                        |
-| client_secret     | OAuth Client Secret                    |
-| scope             | Space separated scope List (optional)  |
-| redirect_uri      | Alternative Redirect URI (optional)    |
+| Parameter-Name | Description                           |
+|----------------|---------------------------------------|
+| client_id      | OAuth Client ID                       |
+| client_secret  | OAuth Client Secret                   |
+| scope          | Space separated scope List (optional) |
+| redirect_uri   | Alternative Redirect URI (optional)   |
 
 When configuring the OAuth parameters at your external OAuth provider, a redirect URI has to be supplied. This redirect URI has to point to the path `/login/<provider>`.
 If not supplied, the OAuth redirect URI is calculated out of the current URL. This should work in most cases and should even work
