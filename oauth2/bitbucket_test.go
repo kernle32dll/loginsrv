@@ -1,12 +1,11 @@
 package oauth2
 
 import (
+	"encoding/json"
+	"github.com/stretchr/testify/suite"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"github.com/gorilla/mux"
-	"github.com/stretchr/testify/suite"
-	"encoding/json"
 )
 
 var bitbucketTestUserResponse = `{
@@ -84,7 +83,7 @@ type BitbucketTestSuite struct {
 
 // SetupTest a method that will be run before any method of this suite. It setups a mock server for bitbucket API
 func (suite *BitbucketTestSuite) SetupTest() {
-	r := mux.NewRouter()
+	r := http.NewServeMux()
 
 	userHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		suite.Equal("secret", r.FormValue("access_token"))
@@ -118,7 +117,7 @@ func (suite *BitbucketTestSuite) Test_Bitbucket_getUserInfo() {
 }
 
 // Test_Bitbucket_getPrimaryEmailAddress Tests the returned primary email is the expected email
-func (suite *BitbucketTestSuite) Test_Bitbucket_getPrimaryEmailAddress()  {
+func (suite *BitbucketTestSuite) Test_Bitbucket_getPrimaryEmailAddress() {
 	userEmails := emails{}
 	err := json.Unmarshal([]byte(bitbucketTestUserEmailResponse), &userEmails)
 	suite.NoError(err)
